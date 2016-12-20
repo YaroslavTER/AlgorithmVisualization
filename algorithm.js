@@ -3,7 +3,7 @@ var ctx = canvas.getContext('2d')
 var color = '#000000'
 var side = 20
 var rows = canvas.clientHeight/side, colums = canvas.clientWidth/side
-var time = 3000
+var time = 300
 var array = []
 
 function SetRandom(min, max, length){
@@ -14,6 +14,47 @@ function SetRandom(min, max, length){
 
 function GetRandomIn(min, max){
     return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+function BottomUpMerge(array, leftPosition, chunkSize, workArray) {
+    var index
+    var rightPosition = leftPosition + chunkSize
+    var endPosition = Math.min(leftPosition + chunkSize * 2 - 1,
+                             array.length - 1)
+    var leftIndex = leftPosition
+    var rightIndex = rightPosition
+
+    var timeCounter = 1
+
+    for (index = 0; index <= endPosition - leftPosition; index++) {
+        if (leftIndex < rightPosition && (rightIndex > endPosition ||
+            array[leftIndex] <= array[rightIndex])) {
+            workArray[index] = array[leftIndex++];
+        }else workArray[index] = array[rightIndex++]
+        StopAndDraw(workArray.slice(), timeCounter++)
+    }
+
+    for (index = leftPosition; index <= endPosition; index++) {
+        array[index] = workArray[index - leftPosition]
+    }
+}
+
+function StopAndDraw(inputArray, counter){
+    setTimeout(function(){Draw(inputArray)}, time*counter)
+}
+
+function Sort(array) {
+    var workArray = new Array(array.length)
+    var chunkSize = 1
+    while (chunkSize < array.length) {
+        var index = 0
+        while (index < array.length - chunkSize) {
+            BottomUpMerge(array, index, chunkSize, workArray)
+            index += chunkSize * 2
+        }
+        chunkSize *= 2
+    }
+    return array
 }
 
 function Draw(inputArray){
@@ -30,56 +71,10 @@ function Draw(inputArray){
     }
 }
 
-function MergeSort(inputArray){
-    if (inputArray.length < 2)
-        return inputArray
-
-    var middle = Math.floor(inputArray.length / 2)
-    var left = inputArray.slice(0, middle)
-    var right = inputArray.slice(middle)
-    var params = Merge(MergeSort(left), MergeSort(right))
-    StopAndDraw(left)
-    StopAndDraw(middle)
-    StopAndDraw(right)
-    params.unshift(0, inputArray.length)
-    inputArray.splice.apply(inputArray, params)
-    StopAndDraw(inputArray)
-    return inputArray
-}
-
-function Merge(left, right){
-    var result = []
-    var leftIndex = 0
-    var rightIndex = 0
-    StopAndDraw(left)
-    StopAndDraw(right)
-    while (leftIndex < left.length && rightIndex < right.length){
-        if (left[leftIndex] < right[rightIndex]){
-            result.push(left[leftIndex++])
-            StopAndDraw(left)
-        }else{
-            result.push(right[rightIndex++])
-            StopAndDraw(right)
-        }
-    }
-    return result.concat(left.slice(leftIndex))
-                 .concat(right.slice(rightIndex))
-}
-
-function StopAndDraw(inputArray){
-    setTimeout(function(){Draw(inputArray)}, time)
-}
-
 SetRandom(1,rows,colums)
-//MergeSort(array)
 Draw(array)
 
 document.addEventListener('keydown', function(event) {
-    if(event.which == 13){
-        MergeSort(array)
-
-    }
+    if(event.which == 13 || event.which == 32)
+        Sort(array)
 })
-/*
-mainGameCycle = setInterval(function(){
-},moveTime)*/
