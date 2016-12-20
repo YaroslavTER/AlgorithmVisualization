@@ -3,7 +3,7 @@ var ctx = canvas.getContext('2d')
 var color = '#000000'
 var side = 20
 var rows = canvas.clientHeight/side, colums = canvas.clientWidth/side
-var time = 300
+var time = 150
 var array = []
 
 function SetRandom(min, max, length){
@@ -31,7 +31,6 @@ function BottomUpMerge(array, leftPosition, chunkSize, workArray) {
             array[leftIndex] <= array[rightIndex])) {
             workArray[index] = array[leftIndex++];
         }else workArray[index] = array[rightIndex++]
-        StopAndDraw(workArray.slice(), timeCounter++)
     }
 
     for (index = leftPosition; index <= endPosition; index++) {
@@ -46,10 +45,12 @@ function StopAndDraw(inputArray, counter){
 function Sort(array) {
     var workArray = new Array(array.length)
     var chunkSize = 1
+    var timeCounter = 1
     while (chunkSize < array.length) {
         var index = 0
         while (index < array.length - chunkSize) {
             BottomUpMerge(array, index, chunkSize, workArray)
+            StopAndDraw(array.slice(), timeCounter++)
             index += chunkSize * 2
         }
         chunkSize *= 2
