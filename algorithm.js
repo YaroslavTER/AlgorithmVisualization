@@ -84,6 +84,10 @@ function Sort(array) {
     return array
 }
 
+function BeginSort(){
+    Sort(array)
+}
+
 function Draw(inputArray){
     ctx.fillStyle = color
     ctx.clearRect(0,0,side*colums,side*rows)
