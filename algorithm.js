@@ -1,6 +1,7 @@
 var canvas = document.getElementById('algorithm_id')
 var ctx = canvas.getContext('2d')
-var color = '#000000'
+const BLACK = '#000000'
+const RED = '#ff0000'
 var side = 10
 var rows = canvas.clientHeight/side, colums = canvas.clientWidth/side
 var time = 150
@@ -8,15 +9,21 @@ var array = []
 
 function SetRandom(min, max, length){
     array = new Array(length)
-    for(var index = 0; index < array.length; index++)
-        array[index] = GetRandomIn(min, max)
+    for(var index = 0; index < array.length; index++){
+        var element = {}
+        SetElement(element, GetRandomIn(min, max), BLACK)
+        array[index] = element
+    }
 }
 
 function SetRandomPositions(){
     array = new Array(rows)
     var length = array.length
-    for(var index = 0; index < length ; index++)
-        array[index] = index + 1
+    for(var index = 0; index < length ; index++){
+        var element = {}
+        SetElement(element, index+1, BLACK)
+        array[index] = element
+    }
     Mix()
     Draw(array)
 }
@@ -25,6 +32,11 @@ function Mix(){
     var length = array.length
     for(var index = 0; index < length; index++)
         Swap(index, GetRandomIn(0, length-1))
+}
+
+function SetElement(element, inputValue, inputColor){
+    element.value = inputValue
+    element.color = inputColor
 }
 
 function Swap(firstPosition, secondPosition){
@@ -54,18 +66,16 @@ function BottomUpMerge(array, leftPosition, chunkSize, workArray) {
 
     for (index = 0; index <= endPosition - leftPosition; index++) {
         if (leftIndex < rightPosition && (rightIndex > endPosition ||
-            array[leftIndex] <= array[rightIndex])) {
-            workArray[index] = array[leftIndex++];
-        }else workArray[index] = array[rightIndex++]
+            array[leftIndex].value <= array[rightIndex].value)) {
+            workArray[index] = array[leftIndex++]
+        } else {
+            workArray[index] = array[rightIndex++]
+        }
     }
 
     for (index = leftPosition; index <= endPosition; index++) {
         array[index] = workArray[index - leftPosition]
     }
-}
-
-function StopAndDraw(inputArray, counter){
-    setTimeout(function(){Draw(inputArray)}, time*counter)
 }
 
 function Sort(array) {
@@ -84,18 +94,23 @@ function Sort(array) {
     return array
 }
 
+function StopAndDraw(inputArray, counter){
+    setTimeout(function(){ Draw(inputArray.slice()) }, time*counter)
+}
+
 function BeginSort(){
     Sort(array)
 }
 
 function Draw(inputArray){
-    ctx.fillStyle = color
     ctx.clearRect(0,0,side*colums,side*rows)
     var counter = 1
     var valueSide
     var diff;
     for(var index = 0; index < inputArray.length; index++){
-        valueSide = inputArray[index]
+        var element = inputArray[index]
+        ctx.fillStyle = element.color
+        valueSide = element.value
         diff=(rows-valueSide)*side
         ctx.fillRect(side*counter-side, diff, side, valueSide*side)
         counter++
