@@ -86,7 +86,7 @@ function Sort(array) {
         var index = 0
         while (index < array.length - chunkSize) {
             BottomUpMerge(array, index, chunkSize, workArray)
-            StopAndDraw(array.slice(), timeCounter++)
+            StopAndDraw(array.slice(), index, timeCounter++)
             index += chunkSize * 2
         }
         chunkSize *= 2
@@ -94,25 +94,28 @@ function Sort(array) {
     return array
 }
 
-function StopAndDraw(inputArray, counter){
-    setTimeout(function(){ Draw(inputArray.slice()) }, time*counter)
+function StopAndDraw(inputArray, index, counter){
+    setTimeout(function(){ Draw(inputArray, index) }, time*counter)
 }
 
 function BeginSort(){
     Sort(array)
 }
 
-function Draw(inputArray){
+function Draw(inputArray, activeIndex){
     ctx.clearRect(0,0,side*colums,side*rows)
     var counter = 1
     var valueSide
     var diff;
     for(var index = 0; index < inputArray.length; index++){
         var element = inputArray[index]
+        if(index == activeIndex)
+            element.color = RED
         ctx.fillStyle = element.color
         valueSide = element.value
         diff=(rows-valueSide)*side
         ctx.fillRect(side*counter-side, diff, side, valueSide*side)
+        element.color = BLACK
         counter++
     }
 }
